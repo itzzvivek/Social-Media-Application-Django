@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 import uuid
 from datetime import datetime
 
-User = get_user_model
+User = get_user_model()
 
 class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -13,4 +13,4 @@ class Profile(models.Model):
     location = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return self.user.username
+        return self.user
