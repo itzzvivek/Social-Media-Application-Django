@@ -11,6 +11,34 @@ from .models import Profile
 def index(request):
     return render(request, 'index.html')
 
+@login_required(login_url='signin')
+def setting(request):
+    user_profile = Profile.objects.get(user=request.user)
+    
+    if request.method == 'POST':
+
+        if request.FILES.get('image') == None:
+            image = user_profile.profile_image
+            bio = request.POST['bio']
+            location = request.POST['location']
+
+            user_profile.profile_img = image
+            user_profile.bio = bio
+            user_profile.location = location
+            user_profile.save()
+            
+        if request.FILES.get('image') != None:
+            image = user_profile.profile_image
+            bio = request.POST['bio']
+            location = request.POST['location']
+
+            user_profile.profile_img = image
+            user_profile.bio = bio
+            user_profile.location = location
+            user_profile.save()
+        return redirect('setting')
+    return render(request,'setting.html',{'user_profile':user_profile})
+        
 def signup(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -60,7 +88,8 @@ def signin(request):
             return redirect('signin')
     else:
         return render(request, 'signin.html')
-    
+
+@login_required(login_url='signin') 
 def logout(request):
     auth.logout(request)
     return redirect('signin')
