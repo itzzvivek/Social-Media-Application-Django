@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import random
 
-from .models import Profile,Post
+from .models import Profile,Post,LikePost
 
 @login_required(login_url='signin')
 def index(request):
@@ -29,7 +29,27 @@ def upload(request):
         return redirect('/')
     else:
         return redirect('/')
+    
+@login_required(login_url='sign')
+def like_post(request):
+    username = request.user.username
+    post_id = request.GET.get('post_id')
 
+    post = Post.objects.get(id=post_id)
+    like_filter = LikePost.objects.filter(post_id=post_id, username=username).first()\
+    
+    if like_filter == None:
+        new_like = LikePost.objects.create(post_id=post_id, username=username)
+        new_like.save()
+        post.no_of_like = post.no_of_like + 1
+        post.save()
+        return redirect('/')
+    else:
+        like_filter.delete()
+        post.no_of_like = post.no_of_like - 1
+        post.save()
+        return redirect('/')
+    
 @login_required(login_url='signin')
 def setting(request):
     user_profile = Profile.objects.get(user=request.user)
