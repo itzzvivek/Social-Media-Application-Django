@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import random
 
-from .models import Profile,Post,LikePost
+from .models import Profile,Post,LikePost,FollowerCount
 
 @login_required(login_url='signin')
 def index(request):
@@ -125,7 +125,23 @@ def signup(request):
             return redirect('signup')
     else:
         return render(request, 'signup.html')
-    
+
+login_required(login_url='signin')
+def follow(request):
+    if request.method == 'POST':
+        follower = request.POST['follower']
+        user = request.POST['user']
+
+        if FollowerCount.objects.filter(follower=follower, user=user).first():
+            delete_follower = FollowerCount.objects.get(follower=follower,user=user)
+            delete_follower.delete()
+            return redirect('/profile/'+user)
+        else:
+            new_follower = FollowerCount.objects.create(follower=follower, user=user)
+            new_follower.save()
+            return redirect('/profile/'+user)
+    else:
+        return redirect('/')
 
 def signin(request):
     if request.method == 'POST':
