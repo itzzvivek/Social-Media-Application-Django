@@ -36,15 +36,20 @@
 						{% else %}
 						<span style="color: white; font-size: 27px;"><b>{{user_post_length}} Posts</b></span>
 						{% endif %}
-						<span style="color: white; font-size: 27px;"><b>1.7m followers</b></span>
-						<span style="color: white; font-size: 27px;"><b>3.5k following</b></span>
+
+						{% if user_follower == 0 & user_follower == 1 %}
+						<span style="color: white; font-size: 27px;"><b>{{user_follower}} Follower</b></span>
+						{% else %}
+						<span style="color: white; font-size: 27px;"><b>{{user_follower}} Followers</b></span>
+						{% endif %}
+						<span style="color: white; font-size: 27px;"><b>{{user_following}}</b></span>
 
 						<input type="hidden" value="{{user.username}}" name="follower" />
 						<input type="hidden" value="{{user_object.username}}" name="follower" />
 						{% if user_object.username == user.username %}
-						<a data-ripple="" href="setting"><button type="submit" style="background-color: #ffc0cb; border: #ffc0cb;">Account Setting</button></a>
+						<a href="/setting"><button type="button" style="background-color: #ffc0cb; border: #ffc0cb;">Account Setting</button></a>
 						{% else %}
-						<a data-ripple=""><button type="submit" style="background-color: #ffc0cb; border: #ffc0cb;">Follow</button></a>
+						<a data-ripple=""><button type="submit" style="background-color: #ffc0cb; border: #ffc0cb;">{{button.text}}</button></a>
 						{% endif %}
 					</div>
 				</form>	
