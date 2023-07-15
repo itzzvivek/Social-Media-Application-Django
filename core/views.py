@@ -3,6 +3,7 @@ from django.contrib.auth.models import User,auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from itertools import chain
 import random
 
 from .models import Profile,Post,LikePost,FollowerCount
@@ -11,6 +12,20 @@ from .models import Profile,Post,LikePost,FollowerCount
 def index(request):
     user_object = User.objects.get(username=request.user.username)
     user_profile = Profile.objects.get(user=user_object)
+
+    user_following_list = []
+    feed = []
+
+    user_following = FollowerCount.objects.filter(follower=request.user.username)
+
+    for users in user_following:
+        user_following_list.append(users.user)
+    
+    for usernames in user_following_list:
+        feed_lists = Post.objects.filter(user=usernames)
+        feed.append(feed_lists)
+    
+    feed_lists = list(chain(*feed))
 
     posts = Post.objects.all()
     return render(request, 'index.html',{'user_profile':user_profile,'posts':posts})

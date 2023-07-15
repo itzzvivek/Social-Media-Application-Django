@@ -37,7 +37,7 @@
 						<span style="color: white; font-size: 27px;"><b>{{user_post_length}} Posts</b></span>
 						{% endif %}
 
-						{% if user_follower == 0 & user_follower == 1 %}
+						{% if user_follower == 0 or user_follower == 1 %}
 						<span style="color: white; font-size: 27px;"><b>{{user_follower}} Follower</b></span>
 						{% else %}
 						<span style="color: white; font-size: 27px;"><b>{{user_follower}} Followers</b></span>
