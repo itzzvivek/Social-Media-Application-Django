@@ -27,8 +27,31 @@ def index(request):
     
     feed_lists = list(chain(*feed))
 
-    posts = Post.objects.all()
-    return render(request, 'index.html',{'user_profile':user_profile,'posts':posts})
+    #user suggestion start
+    all_users= User.objects.all()
+    user_following_all = []
+
+    for user in user_following:
+        user_list = User.objects.get(username=user.user)
+        user_following_all.append(user_list)
+
+    new_suggestions_list = [x for x in list(all_users) if (x not in list(user_following_all))]
+    current_user = User.objects.filter(username=request.user.username)
+    final_suggestion_list = [x for x in list(new_suggestions_list) if(x not in list(current_user))]
+    random.shuffle(final_suggestion_list)
+
+    username_profile = []
+    username_profile_list = []
+
+    for users in final_suggestion_list:
+        username_profile.append(users.id)
+
+    for ids in username_profile:
+        profile_lists = Profile.objects.filter(id_user = ids)
+        username_profile_list.append(profile_lists)
+
+    suggestions_username_profile_list = list(chain(*username_profile_list))
+    return render(request, 'index.html',{'user_profile':user_profile,'posts':feed_lists, 'suggestions_username_profile_list':suggestions_username_profile_list[:4 ]})
 
 @login_required(login_url='signin')
 def profile(request,pk):
@@ -74,13 +97,34 @@ def upload(request):
     else:
         return redirect('/')
     
+@login_required(login_url='signin')
+def search(request):
+    user_object = User.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        username_object = User.objects.filter(username__icontains=username)
+
+        username_profile = []
+        username_profile_list = []
+
+        for users in username_object:
+            username_profile.append(users.id)
+        for ids in username_profile:
+            profile_lists = Profile.objects.filter(id_user=ids)
+            username_profile_list.append(profile_lists)
+        username_profile_list = list(chain(*username_profile_list))
+    return render(request,'search.html',{'user_profile':user_profile,'username_profile_list':username_profile_list})
+
+
 @login_required(login_url='sign')
 def like_post(request):
     username = request.user.username
     post_id = request.GET.get('post_id')
 
     post = Post.objects.get(id=post_id)
-    like_filter = LikePost.objects.filter(post_id=post_id, username=username).first()\
+    like_filter = LikePost.objects.filter(post_id=post_id, username=username).first()
     
     if like_filter == None:
         new_like = LikePost.objects.create(post_id=post_id, username=username)
